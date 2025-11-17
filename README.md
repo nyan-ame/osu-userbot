@@ -1,2 +1,32 @@
-# osu-userbot
-osu!userbot для telegram
+# osu! Telegram Userbot
+Автоматический бот для Telegram: при получении личного сообщения отправляет текущий статус osu! (карта, SR, моды, длина) из Tosu. Работает только во время игры (и если score > 0).
+
+## Требования
+* Python 3.8+.
+* Библиотеки: telethon, requests. Установи: ```pip install telethon requests```
+* Tosu (ничего настраивать не нужно)
+* API-ключ osu! [тык](https://osu.ppy.sh/p/api/)
+* Telegram: API_ID, API_HASH [тык](https://my.telegram.org/) (как создать - легко гуглится)
+
+## Настройка:
+* API_ID = твой_id
+* API_HASH = 'твой_hash'
+* PHONE = 'твой_номер' (в международном формате).
+* OSU_API_KEY = 'твой_ключ'
+* OSU_USER_ID = твой_id (не используется напрямую, но для справки).
+* GOSU_PORT = 24050 (По умолчанию Tosu использует порт 24050. Меняйте, если знаете, что делаете).
+
+## Как работает:
+1) Бот слушает ЛС в Telegram.
+2) Если приходит сообщение: опрашивает Tosu по HTTP (localhost:24050/json).
+3) Проверяет: gameplay активен + score > 0.
+4) Извлекает: режим (std/taiko/catch/mania XK), fullSR (с модами, fallback на base SR из API), моды, метаданные карты (API).
+5) Отправляет HTML-ответ: 
+
+<b>now playing osu! (режим)</b><br>Map: [Artist - Title [Diff]]<br>Star: 4.50⭐️ +Mods (Если есть)<br>Length: 2:15.
+
+6) Debug: логи в консоль (mode, SR, mods). Если пришло сообщение, но игра неактивна, бот ничего не напишет в телеграм (но в логах укажет).
+
+
+
+Код целиком и полностью был написан через Grok 4 для личного использования.

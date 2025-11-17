@@ -4,7 +4,7 @@
 ## Требования
 * Python 3.8+.
 * Библиотеки: telethon, requests. Установи: ```pip install telethon requests```
-* Tosu (ничего настраивать не нужно)
+* [Tosu](https://tosu.app) (ничего настраивать не нужно)
 * API-ключ osu! [тык](https://osu.ppy.sh/p/api/)
 * Telegram: API_ID, API_HASH [тык](https://my.telegram.org/) (как создать - легко гуглится)
 

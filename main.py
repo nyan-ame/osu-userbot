@@ -8,15 +8,19 @@ import json
 from datetime import timedelta
 
 # Настройки Telegram (получите на my.telegram.org)
-API_ID = api_id
-API_HASH = 'api_hash'
-PHONE = '+1 number'
-OSU_API_KEY = 'api_key'  # Получи на osu.ppy.sh/p/api
-OSU_USER_ID = user_id  # Твой osu! user ID
+API_ID = 1
+API_HASH = '2'
+PHONE = '+3'
+OSU_API_KEY = '4'  # Получи на osu.ppy.sh/p/api
+OSU_USER_ID = 5  # Твой osu! user ID
 
 # Порт gosumemory (по умолчанию 24050)
 GOSU_PORT = 24050
 
+# Per-user кулдаун в RAM
+COOLDOWN = 45  # секунд, настрой под себя
+last_response = {}  # {user_id: timestamp} — хранится в памяти
+cooldown_lock = asyncio.Lock()  # Для thread-safety
 
 client = TelegramClient(
     'osu_userbot_session',  # Имя сессии (файл .session сохраняется автоматически)
@@ -226,11 +230,27 @@ Length: {length}
 async def message_handler(event):
     if not event.is_private:
         return
+    
+    print(f"Получено сообщение: chat_id={event.chat_id}, is_private={event.is_private}, text='{event.text[:50]}...'")  # Debug только для ЛС
+    
+    user_id = event.chat_id
+    current_time = time.time()
+    
+    # Per-user кулдаун с lock'ом
+    async with cooldown_lock:
+        if user_id in last_response and current_time - last_response[user_id] < COOLDOWN:
+            remaining = COOLDOWN - (current_time - last_response[user_id])
+            print(f"Кулдаун для {user_id}: жду {remaining:.0f}с")
+            return
+    
     print("Получено ЛС — проверяю статус osu!...")
     status = get_osu_status()
     if status:
         await event.respond(status, parse_mode='html')
         print("Ответ отправлен!")
+        # Обновляем кулдаун
+        async with cooldown_lock:
+            last_response[user_id] = current_time
     else:
         print("Статус не playing — молчу.")
 
